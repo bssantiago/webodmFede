@@ -9,7 +9,6 @@
   <div id="cesiumContainer"></div>
 
   <script type="module">
-    // IMPORTANT: lowercase "esm/cesium.js" path
   import {
     Ion, Viewer, createWorldTerrainAsync, IonResource, Cesium3DTileset
   } from "https://cdn.jsdelivr.net/npm/cesium@1.122/Build/Cesium/index.js";
@@ -19,12 +18,8 @@
       const viewer = new Viewer("cesiumContainer", {
     terrainProvider
   });
-
-    
-    // test: log to confirm the symbol exists
     console.log("Has Cesium3DTileset?", typeof Cesium3DTileset);
 
-    // Example: ion tileset
      const resource = await IonResource.fromAssetId(2275207);
      const tileset = await (Cesium3DTileset.fromUrl
        ? Cesium3DTileset.fromUrl(resource)
