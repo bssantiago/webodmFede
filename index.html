@@ -15,9 +15,12 @@
   } from "https://cdn.jsdelivr.net/npm/cesium@1.122/Build/Cesium/index.js";
 
     Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3YzllMGE4MS0xNTAzLTQwZjEtOGIzZC02Y2VlYTdmODNkOTYiLCJpZCI6MzQ0MDUwLCJpYXQiOjE3NTg2NjE5Mjd9.4Ay7EgvW-9ABvw5qU0WhV1m2UC980A6MBK6M7HcPxKI";
+    const terrainProvider = await createWorldTerrainAsync();
+      const viewer = new Viewer("cesiumContainer", {
+    terrainProvider
+  });
 
-    const viewer = new Viewer("cesiumContainer", { terrain: createWorldTerrain() });
-
+    
     // test: log to confirm the symbol exists
     console.log("Has Cesium3DTileset?", typeof Cesium3DTileset);
 
