@@ -27,9 +27,16 @@
     });
 
 const resource = await IonResource.fromAssetId(2275207);
-const tileset = await Cesium3DTileset.fromUrl(resource);
-viewer.scene.primitives.add(tileset);
-viewer.zoomTo(tileset);
+
+const tileset = (Cesium3DTileset.fromUrl)
+    ? await Cesium3DTileset.fromUrl(resource)              // modern API
+    : new Cesium3DTileset({ url: resource });              // fallback
+
+  viewer.scene.primitives.add(tileset);
+  await tileset.readyPromise;
+  viewer.zoomTo(tileset);
+
+
     
 
     // 3) OPTIONAL: Load a 3D Tiles asset you uploaded to Cesium ion
