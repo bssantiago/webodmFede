@@ -4,28 +4,59 @@
 
 <body style="margin:0; overflow:hidden">
   <a-scene
+    embedded
     vr-mode-ui="enabled: false"
     renderer="logarithmicDepthBuffer: true"
-    embedded
     arjs="sourceType: webcam; debugUIEnabled: false;"
   >
-    <!-- Load your model -->
     <a-assets>
-      <!-- Use .glb or .gltf with embedded buffers/textures -->
-      <a-asset-item id="myModel" src="city_pack_3.glb"></a-asset-item>
+      <a-asset-item id="m" src="city_pack_3.glb"></a-asset-item>
     </a-assets>
 
-    <!-- Attach model to the marker (HIRO marker) -->
-    <a-marker type="pattern" preset="hiro">
-      <a-entity
-        gltf-model="#myModel"
-        position="0 0 0"
-        rotation="0 0 0"
-        scale="0.1 0.1 0.1">
-      </a-entity>
+    <a-marker preset="hiro">
+      <!-- start with neutral scale; we'll auto-scale in JS -->
+      <a-entity id="model" gltf-model="#m" scale="1 1 1" position="0 0 0"></a-entity>
     </a-marker>
 
-    <!-- AR camera -->
     <a-entity camera></a-entity>
   </a-scene>
+
+  <script>
+    // Desired size the model should fit into (in meters, relative to the marker)
+    const DESIRED_SIZE = 0.5; // try 0.2 .. 1.0 depending on what you like
+
+    const el = document.getElementById('model');
+    el.addEventListener('model-loaded', (e) => {
+      const THREE = AFRAME.THREE;
+      const obj = e.detail.model;               // THREE.Object3D of your model
+
+      // (Optional) avoid culling issues
+      obj.traverse(o => o.frustumCulled = false);
+
+      // Compute bounding box
+      const box = new THREE.Box3().setFromObject(obj);
+      const size = box.getSize(new THREE.Vector3());
+      const center = box.getCenter(new THREE.Vector3());
+      const maxDim = Math.max(size.x, size.y, size.z);
+
+      // Scale uniformly so the largest dimension == DESIRED_SIZE
+      const s = DESIRED_SIZE / maxDim;
+      el.object3D.scale.set(s, s, s);
+
+      // Recompute bottom after scaling and place the model on the marker plane (y = 0)
+      const minY = box.min.y * s;
+      const cx = center.x * s;
+      const cz = center.z * s;
+
+      // Move model so its base sits on the marker and it's centered in X/Z
+      el.object3D.position.set(-cx, -minY, -cz);
+
+      // If your model appears rotated, you can adjust:
+      // el.object3D.rotation.set(THREE.MathUtils.degToRad(-90), 0, 0); // example
+    });
+
+    el.addEventListener('model-error', (e) => {
+      console.error('Model failed to load:', e.detail);
+    });
+  </script>
 </body>
