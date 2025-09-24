@@ -40,7 +40,7 @@
       const maxDim = Math.max(size.x, size.y, size.z);
 
       // Scale uniformly so the largest dimension == DESIRED_SIZE
-      const s = DESIRED_SIZE / maxDim;
+      const s = (DESIRED_SIZE / maxDim) * 3;
       el.object3D.scale.set(s, s, s);
 
       // Recompute bottom after scaling and place the model on the marker plane (y = 0)
