@@ -15,7 +15,7 @@
 
     <a-marker preset="hiro">
       <!-- start with neutral scale; we'll auto-scale in JS -->
-      <a-entity id="model" gltf-model="#m" scale="1 1 1" position="0 0 0"></a-entity>
+      <a-entity id="model" gltf-model="#m" scale="3 3 3" position="0 0 0"></a-entity>
     </a-marker>
 
     <a-entity camera></a-entity>
@@ -25,23 +25,25 @@
     // Desired size the model should fit into (in meters, relative to the marker)
     const DESIRED_SIZE = 1; // try 0.2 .. 1.0 depending on what you like
 
-    const el = document.getElementById('model');
-    el.addEventListener('model-loaded', (e) => {
-      const THREE = AFRAME.THREE;
-      const obj = e.detail.model;               // THREE.Object3D of your model
+const SCALE_MULTIPLIER = 3;
 
-      // (Optional) avoid culling issues
-      obj.traverse(o => o.frustumCulled = false);
+const el = document.getElementById('model');
+el.addEventListener('model-loaded', (e) => {
+  const THREE = AFRAME.THREE;
+  const obj = e.detail.model;
+  const box = new THREE.Box3().setFromObject(obj);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z);
 
-      // Compute bounding box
-      const box = new THREE.Box3().setFromObject(obj);
-      const size = box.getSize(new THREE.Vector3());
-      const center = box.getCenter(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
+  const s = (1 / maxDim) * SCALE_MULTIPLIER; // fit, then triple
+  el.object3D.scale.set(s, s, s);
 
-      // Scale uniformly so the largest dimension == DESIRED_SIZE
-      const s = DESIRED_SIZE / maxDim;
-      el.object3D.scale.set(s, s, s);
+  const minY = box.min.y * s;
+  const cx = center.x * s;
+  const cz = center.z * s;
+  el.object3D.position.set(-cx, -minY, -cz);
+});
 
       // Recompute bottom after scaling and place the model on the marker plane (y = 0)
       const minY = box.min.y * s;
