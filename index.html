@@ -17,7 +17,7 @@ Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxYWYxY
 const viewer = new Viewer("cesiumContainer");
 
 try {
-  const tileset = await Cesium3DTileset.fromIonAssetId(3798259);
+  const tileset = await Cesium3DTileset.fromIonAssetId(3798269);
   viewer.scene.primitives.add(tileset);
   await viewer.zoomTo(tileset);
     tileset.style = new Cesium.Cesium3DTileStyle(extras.ion.defaultStyle);
