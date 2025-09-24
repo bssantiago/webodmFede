@@ -13,14 +13,14 @@
     Ion, Viewer, createWorldTerrainAsync, IonResource, Cesium3DTileset
   } from "https://cdn.jsdelivr.net/npm/cesium@1.122/Build/Cesium/index.js";
 
-    Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3YzllMGE4MS0xNTAzLTQwZjEtOGIzZC02Y2VlYTdmODNkOTYiLCJpZCI6MzQ0MDUwLCJpYXQiOjE3NTg2NjE5Mjd9.4Ay7EgvW-9ABvw5qU0WhV1m2UC980A6MBK6M7HcPxKI";
+    Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIxYWYxY2FjNS1hY2Q2LTQ5MWMtYTY4NS05M2VhZTg0MmYwM2YiLCJpZCI6MzQ0MzM4LCJpYXQiOjE3NTg3NDYxMjF9.W5rXaCR3RnikPA9eFo-rH_l7Tqx_IGn9nccpJJFtyqQ";
     const terrainProvider = await createWorldTerrainAsync();
       const viewer = new Viewer("cesiumContainer", {
     terrainProvider
   });
     console.log("Has Cesium3DTileset?", typeof Cesium3DTileset);
 
-     const resource = await IonResource.fromAssetId(3794542);
+     const resource = await IonResource.fromAssetId(3798256);
      const tileset = await (Cesium3DTileset.fromUrl
        ? Cesium3DTileset.fromUrl(resource)
        : new Cesium3DTileset({ url: resource }));
