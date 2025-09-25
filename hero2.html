@@ -14,49 +14,51 @@
     </a-assets>
 
     <a-marker preset="hiro">
-      <!-- start with neutral scale; we'll auto-scale in JS -->
-      <a-entity id="model" gltf-model="#m" scale="3 3 3" position="0 0 0"></a-entity>
+      <!-- remove scale attribute; JS will set it -->
+      <a-entity id="model" gltf-model="#m" position="0 0 0"></a-entity>
     </a-marker>
 
     <a-entity camera></a-entity>
   </a-scene>
 
   <script>
-    // Desired size the model should fit into (in meters, relative to the marker)
-    const DESIRED_SIZE = 1; // try 0.2 .. 1.0 depending on what you like
+    // How big you want the model’s largest dimension (in meters, relative to the marker).
+    // Try 2–4 to start; 1 is usually small on a 1m marker.
+    const DESIRED_SIZE = 3.0;
+
+    // Optional extra multiplier if you just want it bigger/smaller without recalculating.
+    const SCALE_MULTIPLIER = 1.0;
 
     const el = document.getElementById('model');
     el.addEventListener('model-loaded', (e) => {
       const THREE = AFRAME.THREE;
-      const obj = e.detail.model;               // THREE.Object3D of your model
+      const obj = e.detail.model;
 
-      // (Optional) avoid culling issues
-      obj.traverse(o => o.frustumCulled = false);
+      // Avoid culling & make sure world matrices are updated
+      obj.traverse(o => { o.frustumCulled = false; if (o.geometry) o.geometry.computeBoundingBox?.(); });
+      obj.updateMatrixWorld(true);
 
-      // Compute bounding box
+      // Compute bounds on the loaded object
       const box = new THREE.Box3().setFromObject(obj);
       const size = box.getSize(new THREE.Vector3());
       const center = box.getCenter(new THREE.Vector3());
-      const maxDim = Math.max(size.x, size.y, size.z);
+      const maxDim = Math.max(size.x, size.y, size.z) || 1e-6;
 
-      // Scale uniformly so the largest dimension == DESIRED_SIZE
-      const s = (DESIRED_SIZE / maxDim) * 3;
-      el.object3D.scale.set(s, s, s);
+      // Uniform scale so the largest dimension matches DESIRED_SIZE
+      const s = (DESIRED_SIZE / maxDim) * SCALE_MULTIPLIER;
+      el.object3D.scale.setScalar(s);
 
-      // Recompute bottom after scaling and place the model on the marker plane (y = 0)
+      // Put the model’s base on the marker plane (y=0) and center it in X/Z
+      // (box is in the model’s pre-scaled space, so multiply by s)
       const minY = box.min.y * s;
       const cx = center.x * s;
       const cz = center.z * s;
-
-      // Move model so its base sits on the marker and it's centered in X/Z
       el.object3D.position.set(-cx, -minY, -cz);
 
-      // If your model appears rotated, you can adjust:
-      // el.object3D.rotation.set(THREE.MathUtils.degToRad(-90), 0, 0); // example
+      // If orientation is off, you can rotate:
+      // el.object3D.rotation.set(THREE.MathUtils.degToRad(-90), 0, 0);
     });
 
-    el.addEventListener('model-error', (e) => {
-      console.error('Model failed to load:', e.detail);
-    });
+    el.addEventListener('model-error', (e) => console.error('Model failed to load:', e.detail));
   </script>
 </body>
